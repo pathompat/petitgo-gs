@@ -5,9 +5,11 @@ google script for petitgo
  - To automate something on google sheet
  - To show data using api other platform on google sheet
 
-## Contents
-
-[TOC]
+## Functions
+- Common functions
+- Bigseller
+- Trello
+- Line Notify
 
 ## Common functions
 Global function for using in project
