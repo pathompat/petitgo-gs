@@ -1,3 +1,7 @@
+// =========================================================
+// Common function for sheet
+// =========================================================
+
 function md5 (input) {
   var rawHash = Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, input);
   var txtHash = '';
