@@ -9,6 +9,7 @@ google script for petitgo
 - Common functions
 - Bigseller
 - Trello
+- Woocommerce
 - Line Notify
 
 ## Common functions
