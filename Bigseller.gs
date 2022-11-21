@@ -76,11 +76,11 @@ function callApiProductShopee () {
   Logger.log('call_bigseller_api_product_shopee [resp]:'+ JSON.stringify(json))
   
   const products = decodedJson?.data?.page?.rows || []
-  console.log(products)
+
   return products.reduce((total, cur) => {
     return total.concat(cur.variations.map(v => [ 
-      cur.itemSku, v.variationSku, cur.name, v.originalPriceStr + ' THB', (v.priceStr || cur.priceStr) + ' THB',
-      cur.link, cur.originalImage, v.stock, cur.itemSku
+      cur.itemSku, v.variationSku, cur.name, parseFloat(v.originalPriceStr), parseFloat(v.priceStr || cur.priceStr || v.originalPriceStr),
+      cur.link, cur.originalImage, v.stock
     ]))
   }, [])
 }
