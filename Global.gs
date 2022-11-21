@@ -7,3 +7,6 @@ const LINE_PIG_TOKEN = PropertiesService.getScriptProperties().getProperty('LINE
 
 // trello api
 const TRELLO_API_KEY = PropertiesService.getScriptProperties().getProperty('TRELLO_API_KEY')
+
+// woocommerce api key
+const BASIC_AUTH_WOOCOMMERCE = PropertiesService.getScriptProperties().getProperty('BASIC_AUTH_WOOCOMMERCE')

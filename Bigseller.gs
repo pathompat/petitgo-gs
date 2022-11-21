@@ -45,10 +45,10 @@ function callApiBigSellerInventory () {
 }
 
 // =========================================================
-// Get products show on shopee
+// Get list products on shopee
 // =========================================================
 
-function callApiProductShopee () {
+function callApiListProductShopee () {
   const baseUrl = 'https://www.bigseller.com/api/v1/product/listing/shopee/active.json';
   const params = {
     orderBy: 'create_time',
@@ -75,12 +75,30 @@ function callApiProductShopee () {
 
   Logger.log('call_bigseller_api_product_shopee [resp]:'+ JSON.stringify(json))
   
-  const products = decodedJson?.data?.page?.rows || []
+  return decodedJson?.data?.page?.rows || []
+}
 
-  return products.reduce((total, cur) => {
-    return total.concat(cur.variations.map(v => [ 
-      cur.itemSku, v.variationSku, cur.name, parseFloat(v.originalPriceStr), parseFloat(v.priceStr || cur.priceStr || v.originalPriceStr),
-      cur.link, cur.originalImage, v.stock
-    ]))
-  }, [])
+// =========================================================
+// Get one products on lazada
+// =========================================================
+
+function callApiGetProductLazada (bigsellerProductId) {
+  const baseUrl = `https://www.bigseller.com/api/v1/product/listing/lazada/edit/${bigsellerProductId}.json`;
+
+  const response = UrlFetchApp.fetch(baseUrl, {
+    method: 'get',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json;charset=UTF-8',
+      'Cookie': BIGSELLER_COOKIE
+    }
+  })
+
+  // Parse the JSON reply
+  const json = response.getContentText()
+  const decodedJson = JSON.parse(json)
+
+  Logger.log('call_bigseller_api_product_shopee [resp]:'+ JSON.stringify(json))
+  
+  return decodedJson?.data?.product || []
 }
