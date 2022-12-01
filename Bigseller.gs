@@ -41,7 +41,11 @@ function callApiBigSellerInventory () {
   const json = response.getContentText()
   const data = JSON.parse(json)
 
-  return data
+  Logger.log('call_bigseller_api_inventory [resp]:'+ JSON.stringify(json))
+
+  const result = data?.data?.page?.rows.map(e => [e.sku, e.cost])
+
+  return result
 }
 
 // =========================================================

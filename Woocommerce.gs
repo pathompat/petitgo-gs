@@ -1,6 +1,8 @@
 const categoriesMap = {
   'Cat Litters': 50,
-  'Cat Dry Food': 40
+  'Cat Dry Food': 40,
+  'Shampoos & Bath Accessories': 51,
+  'Cat Wet Food': 52
 }
 
 function formatProductLazada(productId) {
