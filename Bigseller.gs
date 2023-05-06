@@ -19,7 +19,7 @@ function callApiSaleStat () {
 
   Logger.log('call_bigseller_api_inventory [resp]:'+ JSON.stringify(response.getContentText()))
 
-  return data.data[0]
+  return data?.data?.[0]
 }
 
 // =========================================================

@@ -1,6 +1,6 @@
 const env = (name) => PropertiesService.getScriptProperties().getProperty(name)
 
-// bigseller
+// bigseller (can be expired)
 const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
 
 // line notify
