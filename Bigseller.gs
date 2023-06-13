@@ -8,7 +8,7 @@ function callApiSaleStat () {
     headers: {
       "Accept": "application/json, text/plain, */*",
       "Content-type": "application/x-www-form-urlencoded;charset=UTF-8",
-      "Cookie": BIGSELLER_COOKIE
+      "Cookie": BIGSELLER_MUC_TOKEN
     },
     payload: ""
   });
