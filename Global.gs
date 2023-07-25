@@ -1,7 +1,7 @@
 const env = (name) => PropertiesService.getScriptProperties().getProperty(name)
 
 // bigseller (can be expired)
-const BIGSELLER_MUC_TOKEN = env('BIGSELLER_MUC_TOKEN')
+const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
 
 // line notify
 const LINE_PERSONAL_TOKEN = env('LINE_PERSONAL_TOKEN')

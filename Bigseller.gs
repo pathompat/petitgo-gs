@@ -8,7 +8,7 @@ function callApiSaleStat () {
     headers: {
       "Accept": "application/json, text/plain, */*",
       "Content-type": "application/x-www-form-urlencoded;charset=UTF-8",
-      "Cookie": BIGSELLER_MUC_TOKEN
+      "Cookie": BIGSELLER_COOKIE
     },
     payload: ""
   });
@@ -34,7 +34,7 @@ function callApiBigSellerInventory () {
       "Content-type": "application/x-www-form-urlencoded;charset=UTF-8",
       "Cookie": BIGSELLER_COOKIE
     },
-    payload: "pageNo=1&pageSize=300&warehouseId=28129&searchType=skuName"
+    payload: "pageNo=1&pageSize=300&searchType=skuName"
   });
 
   // Parse the JSON reply
@@ -42,8 +42,8 @@ function callApiBigSellerInventory () {
   const data = JSON.parse(json)
 
   Logger.log('call_bigseller_api_inventory [resp]:'+ JSON.stringify(json))
-
-  const result = data?.data?.page?.rows.map(e => [e.sku, e.cost])
+  console.log(data?.data?.page?.rows)
+  const result = data?.data?.page?.rows.map(e => [e.sku, e.title, e.warehouseName, e.available, e.cost])
 
   return result
 }
