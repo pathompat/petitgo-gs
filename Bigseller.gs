@@ -1,4 +1,28 @@
 // =========================================================
+// Check user is logged in
+// =========================================================
+
+function callApiCheckLogin () {
+  const response = UrlFetchApp.fetch("https://www.bigseller.com/api/v1/isLogin.json", {
+    method: "get",
+    headers: {
+      "Accept": "application/json, text/plain, */*",
+      "Content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "Cookie": BIGSELLER_COOKIE
+    },
+    payload: ""
+  });
+
+  // Parse the JSON reply
+  const json = response.getContentText()
+  const data = JSON.parse(json)
+
+  Logger.log('call_bigseller_api_check_login [resp]:'+ JSON.stringify(response.getContentText()))
+
+  return data?.data?.[0]
+}
+
+// =========================================================
 // Get latest sale from bigseller
 // =========================================================
 
@@ -17,7 +41,7 @@ function callApiSaleStat () {
   const json = response.getContentText()
   const data = JSON.parse(json)
 
-  Logger.log('call_bigseller_api_inventory [resp]:'+ JSON.stringify(response.getContentText()))
+  Logger.log('call_bigseller_sale_statistic [resp]:'+ JSON.stringify(response.getContentText()))
 
   return data?.data?.[0]
 }
@@ -102,7 +126,7 @@ function callApiGetProductLazada (bigsellerProductId) {
   const json = response.getContentText()
   const decodedJson = JSON.parse(json)
 
-  Logger.log('call_bigseller_api_product_shopee [resp]:'+ JSON.stringify(json))
+  Logger.log('call_bigseller_api_product_lazada [resp]:'+ JSON.stringify(json))
   
   return decodedJson?.data?.product || []
 }
