@@ -32,6 +32,12 @@ function callApiSaleStat () {
     headers: {
       "Accept": "application/json, text/plain, */*",
       "Content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "Connection": "keep-alive",
+      "DNT":1,
+      "Referer": "https://www.bigseller.com/web/dashboard.htm",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-origin",
       "Cookie": BIGSELLER_COOKIE
     },
     payload: ""
