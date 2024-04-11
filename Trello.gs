@@ -6,9 +6,9 @@ const boardMember = [
       "username": "jirayutimanon"
   },
   {
-      "id": "61dd4a518a001d59f446f043",
-      "fullName": "Niranat Thamsuttigul",
-      "username": "niranatthamsuttigul"
+      "id": "65bf66515112179a68546041",
+      "fullName": "Supakan Prasopkaew",
+      "username": "ployskn"
   },
   {
       "id": "5b9a30bd95201128b5a85390",
