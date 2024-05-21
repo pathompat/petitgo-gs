@@ -6,3 +6,10 @@ function getOrders() {
   Logger.log('get_order_from_firestore [resp]:'+ JSON.stringify(orders))
   return orders
 }
+
+function getCookie() {
+  const result = firestore.query("cookies").Execute()
+  const cookie = result?.[0]?.fields?.cookie?.stringValue
+  Logger.log('get_cookie_from_firestore [resp]:'+ JSON.stringify(cookie))
+  return cookie
+}

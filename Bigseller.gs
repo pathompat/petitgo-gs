@@ -1,3 +1,6 @@
+// bigseller (can be expired)
+const BIGSELLER_COOKIE = fetchBigsellerToken(prop = 'BIGSELLER_COOKIE')
+
 // =========================================================
 // Check user is logged in
 // =========================================================
@@ -135,4 +138,23 @@ function callApiGetProductLazada (bigsellerProductId) {
   Logger.log('call_bigseller_api_product_lazada [resp]:'+ JSON.stringify(json))
   
   return decodedJson?.data?.product || []
+}
+
+// =========================================================
+// Get and update latest cookie from firestore
+// =========================================================
+
+function fetchBigsellerToken(prop = 'BIGSELLER_COOKIE') {
+
+  // get firestore bigseller's cookie
+  const cookie = getCookie()
+  if (!cookie) return 
+
+  // get and update latest cookie
+  const scriptProperties = PropertiesService.getScriptProperties()
+  const existedCookie = scriptProperties.getProperty(prop)
+  if(cookie === existedCookie) return existedCookie
+  scriptProperties.setProperty(prop, cookie)
+
+  return cookie
 }
