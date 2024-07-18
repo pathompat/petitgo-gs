@@ -1,6 +1,3 @@
-// bigseller (can be expired)
-const BIGSELLER_COOKIE = fetchBigsellerToken(prop = 'BIGSELLER_COOKIE')
-
 // =========================================================
 // Check user is logged in
 // =========================================================
@@ -29,7 +26,8 @@ function callApiCheckLogin () {
 // Get latest sale from bigseller
 // =========================================================
 
-function callApiSaleStat () {
+function callApiSaleStat (cookie) {
+  console.log(cookie)
   const response = UrlFetchApp.fetch("https://www.bigseller.com/api/v1/orderSalesStatistics.json", {
     method: "post",
     headers: {
@@ -41,7 +39,7 @@ function callApiSaleStat () {
       "Sec-Fetch-Dest": "empty",
       "Sec-Fetch-Mode": "cors",
       "Sec-Fetch-Site": "same-origin",
-      "Cookie": BIGSELLER_COOKIE
+      "Cookie": cookie
     },
     payload: ""
   });
@@ -144,17 +142,18 @@ function callApiGetProductLazada (bigsellerProductId) {
 // Get and update latest cookie from firestore
 // =========================================================
 
-function fetchBigsellerToken(prop = 'BIGSELLER_COOKIE') {
+function fetchBigsellerToken(propName = 'BIGSELLER_COOKIE') {
 
   // get firestore bigseller's cookie
-  const cookie = getCookie()
+  const cookieObj = getCookie()
+  const cookie = cookieObj.cookie
   if (!cookie) return 
 
   // get and update latest cookie
   const scriptProperties = PropertiesService.getScriptProperties()
-  const existedCookie = scriptProperties.getProperty(prop)
-  if(cookie === existedCookie) return existedCookie
-  scriptProperties.setProperty(prop, cookie)
+  const existedCookie = scriptProperties.getProperty(propName)
+  if(cookie === existedCookie) return { cookie: existedCookie, ...cookieObj }
+  scriptProperties.setProperty(propName, cookie)
 
-  return cookie
+  return cookieObj
 }

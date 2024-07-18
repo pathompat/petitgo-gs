@@ -34,3 +34,13 @@ function fetchApi (url, method, headers, payload) {
   if (method === 'GET') url = buildUrl(url, payload)
   return UrlFetchApp.fetch(url, options)
 }
+
+// Function to check date is today
+function isToday(date) {
+  const today = new Date()
+  return (
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth() &&
+    date.getDate() === today.getDate()
+  );
+}

@@ -10,6 +10,20 @@ function getOrders() {
 function getCookie() {
   const result = firestore.query("cookies").Execute()
   const cookie = result?.[0]?.fields?.cookie?.stringValue
-  Logger.log('get_cookie_from_firestore [resp]:'+ JSON.stringify(cookie))
-  return cookie
+  const updatedAt = new Date(result?.[0]?.fields?.updatedAt?.timestampValue)
+  const latestNotifiedAt = new Date(result?.[0]?.fields?.latestNotifiedAt?.timestampValue)
+  Logger.log('get_cookie_from_firestore [resp]:'+ JSON.stringify({ cookie, updatedAt, latestNotifiedAt }))
+  return { cookie, updatedAt, latestNotifiedAt }
+}
+
+function updateLatestNotifiedAt() {
+  const documentPath = 'cookies/opUcESSobnMxGL6QOUSS'
+  const now = new Date()
+  const updatedData = {
+    latestNotifiedAt: now
+  }
+  firestore.updateDocument(documentPath, updatedData, true)
+
+  Logger.log(`Document ${documentPath} updated latest notified date: ${updatedData.latestNotifiedAt}`)
+  return 
 }
