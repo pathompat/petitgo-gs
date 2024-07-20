@@ -10,7 +10,7 @@ function sendNotifySaleStat () {
   const saleStat = callApiSaleStat(cookie)
 
   // check notified within today yet
-  if (isToday(latestNotifiedAt)) return
+  if (isToday(latestNotifiedAt) || !saleStat) return
 
   const keyLatestStat = Object.keys(saleStat).reduce((latest, cur) => new Date(latest) > new Date(cur) ? latest : cur)
   const latestData = saleStat[keyLatestStat]
