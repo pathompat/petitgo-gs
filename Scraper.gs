@@ -1,15 +1,19 @@
-function scrapePriceza() {
+function updateSheetCompetitivePrice() {
   const searchProducts = readListProductFromSheet()
+  const bigsellerShopee = callApiListProductShopee()
+  const bigsellerLazada = callApiListProductLazada()
+  const bigsellerTiktok = callApiListProductTiktok()
+
   searchProducts.forEach(product => {
-    const { row, keyword, priceMin, priceMax } = product
+    const { sku, name, row, keyword, priceMin, priceMax } = product
 
     // load page 1
     const resP1 = requestPriceza(keyword, 1, priceMin, priceMax)
-    const productP1 = parseProductHtmlToList(resP1)
+    const productP1 = scrapePriceza(resP1)
 
     // load page 2
     const resP2 =  requestPriceza(keyword, 2, priceMin, priceMax)
-    const productP2 = parseProductHtmlToList(resP2)
+    const productP2 = scrapePriceza(resP2)
     const listAllProducts = [ ...productP1, ...productP2 ]
     
     // group prices by channel
@@ -27,17 +31,34 @@ function scrapePriceza() {
       const stats = findProductStatistics(prices)
       statByChannel.push({ channel, stats })
     }
+    
+    const mappingSkuShopee = bigsellerShopee.find(e => e.itemSku === sku)
+    const mappingSkuLazada = bigsellerLazada.find(e => e.parentSku === sku)
 
     const shopee = statByChannel.find(e => e.channel === 'shopee')?.stats
+    if (mappingSkuShopee) {
+      shopee.storePrice = mappingSkuShopee.price
+    }
     const lazada = statByChannel.find(e => e.channel === 'lazada')?.stats
-    if (shopee && lazada) {
-      updateStatByRange(row, { shopee, lazada })
+    if (mappingSkuLazada) {
+      // lazada limit: cannot select product price use max sale price instead
+      lazada.storePrice = Math.max(...mappingSkuLazada.variations.filter(p => p.salePrice).map(p => parseFloat(p.salePrice)), 0)
+    }
+
+    const tiktok = {}
+    const mappingSkuTiktok = bigsellerTiktok.find(product => product.name === name)
+    if (mappingSkuTiktok) {
+      // tiktok limit: cannot select product price use max price instead
+      tiktok.storePrice = Math.max(...mappingSkuTiktok.variations.map(p => parseFloat(p.promotionPrice)), 0)
+    }
+    if (shopee && lazada && tiktok) {
+      updateStatByRange(row, { shopee, lazada, tiktok })
     }
   })
 
 }
 
-function parseProductHtmlToList(htmlContent) {
+function scrapePriceza(htmlContent) {
   const $ = Cheerio.load(htmlContent)
 
   const compareList = []
@@ -128,11 +149,12 @@ function updateStatByRange(row, stat) {
   const spreadsheet = SpreadsheetApp.openById(COMP_SPREADSHEET_ID)
   const sheet = spreadsheet.getSheetByName(COMP_SHEET)
 
-  const { minPrice: smin, maxPrice: smax, modePrice: smod, medianPrice: smed  } = stat.shopee
-  const { minPrice: lmin, maxPrice: lmax, modePrice: lmod, medianPrice: lmed } = stat.lazada
-  const newData = [smin, smax, smod, smed, lmin, lmax, lmod, lmed]
+  const { minPrice: smin, maxPrice: smax, modePrice: smod, medianPrice: smed, storePrice: sprice } = stat.shopee
+  const { minPrice: lmin, maxPrice: lmax, modePrice: lmod, medianPrice: lmed, storePrice: lprice } = stat.lazada
+  const { storePrice: tprice } = stat.tiktok
+  const newData = [ smin, smax, smod, smed, lmin, lmax, lmod, lmed, lprice, sprice, tprice ]
 
-  sheet.getRange(row, 6, 1, 8).setValues([newData])
+  sheet.getRange(row, 6, 1, 11).setValues([newData])
   const currentTime = new Date()
   sheet.getRange('B1').setValue(currentTime)
 
