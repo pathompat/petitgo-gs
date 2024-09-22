@@ -27,3 +27,26 @@ function updateLatestNotifiedAt() {
   Logger.log(`Document ${documentPath} updated latest notified date: ${updatedData.latestNotifiedAt}`)
   return 
 }
+
+function replaceProducts(products) {
+
+  const collectionName = "products"
+  const documents = firestore.getDocuments(collectionName);
+  
+  if (documents.length === 0) {
+    Logger.log('get_all_product_from_firestore [resp]: no documents found in the products.')
+  }
+
+  documents.forEach(function(doc) {
+    firestore.deleteDocument(`${collectionName}/${doc.name}`);
+    Logger.log('removed_product_from_firestore [resp]: id: ' + doc.name)
+  })
+  
+  products.forEach(product => {
+    firestore.createDocument(collectionName, product)
+    Logger.log(`crated_product_from_firestore [resp]: created ${product?.id}`)
+  })
+
+  Logger.log(`replaced_product_from_firestore [resp]: removed: ${documents.length} created ${products.length}`)
+  return products.length
+}

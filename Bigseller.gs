@@ -58,6 +58,7 @@ function callApiSaleStat (cookie) {
 // =========================================================
 
 function callApiBigSellerInventory () {
+  const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
   const response = UrlFetchApp.fetch("https://www.bigseller.com/api/v1/inventory/pageList.json", {
     method: "post",
     headers: {
@@ -73,7 +74,6 @@ function callApiBigSellerInventory () {
   const data = JSON.parse(json)
 
   Logger.log('call_bigseller_api_inventory [resp]:'+ JSON.stringify(json))
-  console.log(data?.data?.page?.rows)
   const result = data?.data?.page?.rows.map(e => [e.sku, e.title, e.warehouseName, e.available, e.cost])
 
   return result
@@ -145,8 +145,10 @@ function callApiListProductLazada () {
   const decodedJson = JSON.parse(json)
 
   Logger.log('call_bigseller_api_product_lazada [resp]:'+ JSON.stringify(json))
-  
-  return decodedJson?.data?.page?.rows || []
+  const products = decodedJson?.data?.page?.rows
+  replaceProducts(products)
+
+  return products || []
 }
 
 // =========================================================
