@@ -37,16 +37,40 @@ function replaceProducts(products) {
     Logger.log('get_all_product_from_firestore [resp]: no documents found in the products.')
   }
 
+  // remove all product in collections
   documents.forEach(function(doc) {
     firestore.deleteDocument(`${collectionName}/${doc.name}`);
     Logger.log('removed_product_from_firestore [resp]: id: ' + doc.name)
   })
   
+  // insert product to collections
   products.forEach(product => {
     firestore.createDocument(collectionName, product)
-    Logger.log(`crated_product_from_firestore [resp]: created ${product?.id}`)
+    Logger.log(`created_product_from_firestore [resp]: created ${product?.parentsku}`)
   })
 
-  Logger.log(`replaced_product_from_firestore [resp]: removed: ${documents.length} created ${products.length}`)
+  Logger.log(`replaced_product_from_firestore [resp]: removed: ${documents.length} created: ${products.length}`)
   return products.length
+}
+
+function insertVariationJson(){
+  // example json: [{"variationName":"ทูน่า-น้ำมันมะพร้าว","sellerSku":"PIG-TR-05-480G-TCO"}]
+  const jsonVar = JSON.parse(`================ fill json here =====================`)
+
+  // insert variations to collections
+  jsonVar.forEach(variation => {
+    firestore.createDocument('variations', {
+      sku: variation.sellerSku,
+      name: variation.variationName
+    })
+  })
+
+  Logger.log(`insert_variations_to_firestore [resp]: created: ${jsonVar}`)
+  return jsonVar.length
+}
+
+function getVariations() {
+  const variations = firestore.query("variations").Execute()
+  Logger.log('get_variations_from_firestore [resp]:'+ JSON.stringify(variations))
+  return variations
 }

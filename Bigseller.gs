@@ -118,18 +118,18 @@ function callApiListProductShopee () {
 // Get list products on lazada
 // =========================================================
 
-function callApiListProductLazada () {
+function callApiListProductLazada (status = 'active') {
   const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
-  const baseUrl = 'https://www.bigseller.com/api/v1/product/listing/lazada/active.json';
+  const baseUrl = 'https://www.bigseller.com/api/v1/product/listing/lazada/pageList.json';
+  const statusParam = status === 'active'? { status: 'active', platformStatus: 'active' } : {}
   const params = {
     orderBy: 'create_time',
     desc: 'true',
     searchType: 'productName',
     inquireType: '0',
-    shopeeStatus: 'live',
-    status: 'active',
     pageNo: '1',
-    pageSize: '50'
+    pageSize: '100',
+    ...statusParam
   }
   const response = UrlFetchApp.fetch(buildUrl(baseUrl, params), {
     method: 'get',
@@ -145,10 +145,8 @@ function callApiListProductLazada () {
   const decodedJson = JSON.parse(json)
 
   Logger.log('call_bigseller_api_product_lazada [resp]:'+ JSON.stringify(json))
-  const products = decodedJson?.data?.page?.rows
-  replaceProducts(products)
 
-  return products || []
+  return decodedJson?.data?.page?.rows || []
 }
 
 // =========================================================
