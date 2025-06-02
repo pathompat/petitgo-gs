@@ -18,7 +18,7 @@ function sendNotifySaleStat () {
   const message = `วันที่ ${keyLatestStat}\n📌 ขายได้ ${latestData.orderCount} ออเดอร์\n💰 ยอดขาย ${latestData.amount_str} บาท`
 
   // send message to line
-  const resLine = sendLineNotify(message)
+  const resLine = sendLineMessage(message)
   Logger.log('sendNotifySaleToLineGroup' + JSON.stringify(resLine))
 
   // send message to discord

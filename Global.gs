@@ -3,6 +3,7 @@ const env = (name) => PropertiesService.getScriptProperties().getProperty(name)
 // line notify
 const LINE_PERSONAL_TOKEN = env('LINE_PERSONAL_TOKEN')
 const LINE_PIG_TOKEN = env('LINE_PIG_TOKEN')
+const LINE_PIG_GROUP_ID = env('LINE_PIG_GROUP_ID')
 
 // trello api
 const TRELLO_API_KEY = env('TRELLO_API_KEY')
