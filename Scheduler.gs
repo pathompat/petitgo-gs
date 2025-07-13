@@ -27,7 +27,9 @@ const updateMarketingSheet = async () => {
       const variationMap = variationsFlatMap.find(v => v.variationSku === variation.variationSku)
       const inventoryMap = inventory.find(inv => inv.sku === variation.variationSku)
       const inventoryCost = inventoryMap?.cost || 0
-      const recommendPrice = inventoryCost * 1.145 * 1.1 * 1.01 // Reference: Lazada
+      const recPriceShopee = inventoryCost * 1.12 * 1.1 * 1.01 // Reference: Shopee
+      const recPriceLazada = inventoryCost * 1.145 * 1.1 * 1.01 // Reference: Lazada
+      const recPriceTiktok = inventoryCost * 1.1248 * 1.1 * 1.01 // Reference: Tiktok
 
       const lazada = lazadaProductVariations.find(laz => laz.sellerSku === variation.variationSku)
       const tiktok = tiktokProductsVariations.find(tiktok => tiktok.sellerSku === variation.variationSku)
@@ -37,12 +39,14 @@ const updateMarketingSheet = async () => {
         variation.variationSku,
         variationMap?.variationName,
         variation.stock,
-        inventoryMap?.cost,
-        recommendPrice,
+        inventoryMap?.cost ? parseFloat(inventoryMap?.cost) : null,
+        recPriceShopee,
         variation.originalPrice,
         variation.price,
+        recPriceLazada,
         lazada?.price,
         lazada?.salePrice,
+        recPriceTiktok,
         tiktok?.originalPrice,
         tiktok?.promotionPrice ? parseFloat(tiktok?.promotionPrice) : null
       ]
