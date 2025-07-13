@@ -66,7 +66,7 @@ function callApiBigSellerInventory () {
       "Content-type": "application/x-www-form-urlencoded;charset=UTF-8",
       "Cookie": BIGSELLER_COOKIE
     },
-    payload: "pageNo=1&pageSize=300&searchType=skuName"
+    payload: "pageNo=1&pageSize=300&searchType=skuName&orderBy=onHand&desc=0"
   });
 
   // Parse the JSON reply
@@ -74,9 +74,8 @@ function callApiBigSellerInventory () {
   const data = JSON.parse(json)
 
   Logger.log('call_bigseller_api_inventory [resp]:'+ JSON.stringify(json))
-  const result = data?.data?.page?.rows.map(e => [e.sku, e.title, e.warehouseName, e.available, e.cost])
 
-  return result
+  return data?.data?.page?.rows
 }
 
 // =========================================================
@@ -85,16 +84,16 @@ function callApiBigSellerInventory () {
 
 function callApiListProductShopee () {
   const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
-  const baseUrl = 'https://www.bigseller.com/api/v1/product/listing/shopee/active.json';
+  const baseUrl = 'https://www.bigseller.com/api/v1/product/listing/shopee/pageList.json';
   const params = {
     orderBy: 'create_time',
-    desc: 'true',
+    desc: true,
     searchType: 'productName',
-    inquireType: '0',
+    inquireType: 0,
     shopeeStatus: 'live',
     status: 'active',
-    pageNo: '1',
-    pageSize: '50'
+    pageNo: 1,
+    pageSize: 50
   }
   const response = UrlFetchApp.fetch(buildUrl(baseUrl, params), {
     method: 'get',
@@ -155,16 +154,17 @@ function callApiListProductLazada (status = 'active') {
 
 function callApiListProductTiktok () {
   const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
-  const baseUrl = 'https://www.bigseller.com/api/v1/product/listing/tiktok/active.json';
+  const baseUrl = 'https://www.bigseller.com/api/v1/product/listing/tiktok/pageList.json';
   const params = {
     orderBy: 'create_time',
     desc: 'true',
     searchType: 'productName',
-    inquireType: '0',
-    shopeeStatus: 'live',
+    inquireType: 0,
+    bsStatus: 4,
+    tiktokStatus: 4,
     status: 'active',
     pageNo: '1',
-    pageSize: '50'
+    pageSize: '100'
   }
   const response = UrlFetchApp.fetch(buildUrl(baseUrl, params), {
     method: 'get',
@@ -207,6 +207,47 @@ function callApiGetProductLazada (bigsellerProductId) {
   Logger.log('call_bigseller_api_product_lazada [resp]:'+ JSON.stringify(json))
   
   return decodedJson?.data?.product || []
+}
+
+// =========================================================
+// Get SKU Mapping & Variations
+// =========================================================
+
+function callApiGetSkuMapping () {
+  const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
+  const baseUrl = `https://www.bigseller.com/api/v1/inventory/sku/mapping/pageList.json`;
+  const payload = {
+    pageNo: 1,
+    pageSize: 50,
+    searchType: "sku",
+    searchContent: "",
+    inquireType: 0,
+    mappingCode: "",
+    platform: "shopee",
+    shopIds: [],
+    platformStatus: "",
+    orderBy: "createTime",
+    desc: 1
+  }
+
+  const response = UrlFetchApp.fetch(baseUrl, {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json;charset=UTF-8',
+      'Cookie': BIGSELLER_COOKIE
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  })
+
+  // Parse the JSON reply
+  const json = response.getContentText()
+  const decodedJson = JSON.parse(json)
+
+  Logger.log('call_bigseller_api_sku_mapping [resp]:'+ JSON.stringify(json))
+  
+  return decodedJson?.data?.rows || []
 }
 
 // =========================================================

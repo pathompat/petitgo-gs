@@ -19,6 +19,7 @@ const FIRESTORE_PROJECT_ID = env('FIRESTORE_PROJECT_ID')
 // discord
 const WEBHOOK_PETITGO_NOTIFY = env('WEBHOOK_PETITGO_NOTIFY')
 
-// scraper
+// sheet
 const COMP_SPREADSHEET_ID = env('COMP_SPREADSHEET_ID')
 const COMP_SHEET = env('COMP_SHEET')
+const MKT_SHEET = env('MKT_SHEET')
