@@ -9,13 +9,18 @@ const updateMarketingSheet = async () => {
   const sheet = spreadsheet.getSheetByName(MKT_SHEET)
 
   const shopeeProducts = await callApiListProductShopee()
+  if (shopeeProducts.length === 0) return
   const lazadaProducts = await callApiListProductLazada()
+  if (lazadaProducts.length === 0) return
   const lazadaProductVariations = lazadaProducts.flatMap(product => product.variations)
   const tiktokProducts = await callApiListProductTiktok()
+  if (tiktokProducts.length === 0) return
   const tiktokProductsVariations = tiktokProducts.flatMap(product => product.variations)
   const skuMap = await callApiGetSkuMapping()
+  if (skuMap.length === 0) return
   const variationsFlatMap = skuMap.flatMap(sku => sku.variationList)
   const inventory = await callApiBigSellerInventory()
+  if (inventory.length === 0) return
 
   const startRow = 3
   const lastRow = sheet.getLastRow()
