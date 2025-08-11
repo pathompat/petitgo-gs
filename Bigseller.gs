@@ -189,6 +189,7 @@ function callApiListProductTiktok () {
 // =========================================================
 
 function callApiGetProductLazada (bigsellerProductId) {
+  const BIGSELLER_COOKIE = env('BIGSELLER_COOKIE')
   const baseUrl = `https://www.bigseller.com/api/v1/product/listing/lazada/edit/${bigsellerProductId}.json`;
 
   const response = UrlFetchApp.fetch(baseUrl, {

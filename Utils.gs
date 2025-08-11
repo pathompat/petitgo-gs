@@ -44,3 +44,29 @@ function isToday(date) {
     date.getDate() === today.getDate()
   );
 }
+
+function convertToLineCategory(catName) {
+  if (/cat/i.test(catName)) {
+    return 140;
+  } else if (/dog/i.test(catName)) {
+    return 141;
+  }
+  return 137;
+}
+
+function cleanDescription(html) {
+  // 1. Remove all <img> tags
+  let cleaned = html.replace(/<img[\s\S]*?\/?>|<img[\s\S]*?\\\/>/gi, '');
+
+  // 2. Remove style and class attributes
+  cleaned = cleaned.replace(/\sstyle=\\?"[^"]*\\?"/gi, '')
+                   .replace(/\sclass=\\?"[^"]*\\?"/gi, '');
+
+  // 3. Unescape escaped quotes (\\\" → ")
+  cleaned = cleaned.replace(/\\"/g, '"');
+
+  // 4. Optional: strip unsupported tags like <article>
+  cleaned = cleaned.replace(/<\/?article[^>]*>/gi, '');
+
+  return cleaned;
+}
