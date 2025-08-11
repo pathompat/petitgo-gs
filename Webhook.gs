@@ -29,6 +29,6 @@ const insertProductWithVariants = async () => {
   };
   Logger.log('lineshopping_req [req]:'+ JSON.stringify(lineShoppingReq))
 
-  const req = await sendLineShopCreateProduct(lineShoppingReq)
+  const req = await callLineShopApiCreateProduct(lineShoppingReq)
   Logger.log('call_lineshopping_api_create_product [resp]:'+ JSON.stringify(req))
 }

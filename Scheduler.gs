@@ -83,3 +83,19 @@ const updateFirebaseProductAndStock = async () => {
   const res = replaceProducts(formatProducts)
   Logger.log('update_firebase_product_and_stock: [resp]' + JSON.stringify(res))
 }
+
+// every 1 day at 02:00
+const updateLineShopInventory = async () => {
+    const inventory = await callApiBigSellerInventory()
+    if (inventory.length === 0) return
+
+    const product = await callLineShopApiGetAllProduct()
+    if (product.length === 0) return
+
+    return product.map(p => {
+      return p.variants.map(async v => {
+        const inventoryMap = inventory.find(inv => v.sku === inv.sku)
+        return await callLineShopApiUpdateInventory(v.inventoryId, inventoryMap?.available || 0)
+      })
+    })
+}
