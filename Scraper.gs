@@ -7,17 +7,16 @@ function updateSheetCompetitivePrice() {
   searchProducts.forEach(product => {
     const { sku, name, row, keyword, priceMin, priceMax } = product
 
-    // load page 1
-    const resP1 = requestPriceza(keyword, 1, priceMin, priceMax)
-    const productP1 = scrapePriceza(resP1)
-
-    // load page 2
-    const resP2 =  requestPriceza(keyword, 2, priceMin, priceMax)
-    const productP2 = scrapePriceza(resP2)
-    const listAllProducts = [ ...productP1, ...productP2 ]
+    // load all channel compare price list
+    const channelList = ['LAZADA', 'Shopee', 'TikTok Shop']
+    const allComparePriceList = channelList.reduce((newList, channel) => {
+      const res = requestPriceza(keyword, 1, priceMin, priceMax, channel)
+      const priceList = scrapePriceza(res) || []
+      return newList.concat(priceList)
+    }, [])
     
     // group prices by channel
-    const groupedByChannel = listAllProducts.reduce((acc, item) => {
+    const groupedByChannel = allComparePriceList.reduce((acc, item) => {
       if (!acc[item.channel.toLowerCase()]) {
         acc[item.channel.toLowerCase()] = []
       }
@@ -35,21 +34,21 @@ function updateSheetCompetitivePrice() {
     const mappingSkuShopee = bigsellerShopee.find(e => e.itemSku === sku)
     const mappingSkuLazada = bigsellerLazada.find(e => e.parentSku === sku)
 
-    const shopee = statByChannel.find(e => e.channel === 'shopee')?.stats
+    const shopee = statByChannel.find(e => e.channel === 'shopee')?.stats || {}
     if (mappingSkuShopee) {
-      shopee.storePrice = mappingSkuShopee.price
+      shopee.storePrice = mappingSkuShopee.price || null
     }
-    const lazada = statByChannel.find(e => e.channel === 'lazada')?.stats
+    const lazada = statByChannel.find(e => e.channel === 'lazada')?.stats || {}
     if (mappingSkuLazada) {
       // lazada limit: cannot select product price use max sale price instead
-      lazada.storePrice = Math.max(...mappingSkuLazada.variations.filter(p => p.salePrice).map(p => parseFloat(p.salePrice)), 0)
+      lazada.storePrice = Math.max(...mappingSkuLazada.variations.filter(p => p.salePrice).map(p => parseFloat(p.salePrice)), 0) || null
     }
 
-    const tiktok = {}
+    const tiktok = statByChannel.find(e => e.channel === 'tiktok shop')?.stats || {}
     const mappingSkuTiktok = bigsellerTiktok.find(product => product.name === name)
     if (mappingSkuTiktok) {
       // tiktok limit: cannot select product price use max price instead
-      tiktok.storePrice = Math.max(...mappingSkuTiktok.variations.map(p => parseFloat(p.promotionPrice)), 0)
+      tiktok.storePrice = Math.max(...mappingSkuTiktok.variations.map(p => parseFloat(p.promotionPrice)), 0) || null
     }
     if (shopee && lazada && tiktok) {
       updateStatByRange(row, { shopee, lazada, tiktok })
@@ -77,7 +76,7 @@ function scrapePriceza(htmlContent) {
   return compareList
 }
 
-function requestPriceza(keyword, page = 1, priceMin = 0, priceMax = 500) {
+function requestPriceza(keyword, page = 1, priceMin = 0, priceMax = 500, channel) {
   const url = 'https://www.priceza.com/service/loadMore';
 
   const payload = {
@@ -86,6 +85,7 @@ function requestPriceza(keyword, page = 1, priceMin = 0, priceMax = 500) {
     productdataname: keyword,
     priceMin: priceMin.toString(),
     priceMax: priceMax.toString(),
+    merchant: channel
   }
 
   const options = {
@@ -151,10 +151,10 @@ function updateStatByRange(row, stat) {
 
   const { minPrice: smin, maxPrice: smax, modePrice: smod, medianPrice: smed, storePrice: sprice } = stat.shopee
   const { minPrice: lmin, maxPrice: lmax, modePrice: lmod, medianPrice: lmed, storePrice: lprice } = stat.lazada
-  const { storePrice: tprice } = stat.tiktok
-  const newData = [ smin, smax, smod, smed, lmin, lmax, lmod, lmed, lprice, sprice, tprice ]
+  const { minPrice: tmin, maxPrice: tmax, modePrice: tmod, medianPrice: tmed, storePrice: tprice } = stat.tiktok
+  const newData = [ smin, smax, smod, smed, lmin, lmax, lmod, lmed, tmin, tmax, tmod, tmed, lprice, sprice, tprice ]
 
-  sheet.getRange(row, 6, 1, 11).setValues([newData])
+  sheet.getRange(row, 6, 1, 15).setValues([newData])
   const currentTime = new Date()
   sheet.getRange('B1').setValue(currentTime)
 

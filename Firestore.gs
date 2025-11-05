@@ -74,3 +74,16 @@ function getVariations() {
   Logger.log('get_variations_from_firestore [resp]:'+ JSON.stringify(variations))
   return variations
 }
+
+function insertCompetitiveAnalytics(latestUpdateAt, aiResponse) {
+
+  const collectionName = "competitiveAnalytics"
+  
+  firestore.createDocument(collectionName, {
+    latestUpdateAt,
+    aiResponse
+  })
+  Logger.log(`created_competitive_analytics_firestore [resp]: ${latestUpdateAt}`)
+
+  return latestUpdateAt
+}

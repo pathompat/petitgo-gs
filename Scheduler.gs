@@ -86,6 +86,7 @@ const updateFirebaseProductAndStock = async () => {
 
 // every 1 day at 02:00
 const updateLineShopInventory = async () => {
+    await fetchBigsellerToken()
     const inventory = await callApiBigSellerInventory()
     if (inventory.length === 0) return
 
@@ -98,4 +99,53 @@ const updateLineShopInventory = async () => {
         return await callLineShopApiUpdateInventory(v.inventoryId, inventoryMap?.available || 0)
       })
     })
+}
+
+const insertCompetitveAnalytic = async () => {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Competitive")
+  const values = sheet.getDataRange().getValues();
+  const latestUpdateCell = sheet.getRange('B1').getValue()
+  const parsedLatestUpdate = new Date(latestUpdateCell);
+  const dataRows = values.slice(3);
+
+  const competitveData = dataRows.map(row => {
+    // manual mapping by index
+    // adjust index if your columns change
+    const obj = {
+      parentSku: row[0],   // col A
+      productName: row[1], // col B
+      competitivePrice: {
+        lazada: {
+          min: row[5],     // col F
+          max: row[6],     // col G
+          mode: row[7],    // col H
+          med: row[8],     // col I
+        },
+        shopee: {
+          min: row[9],      // col J
+          max: row[10],     // col K
+          mode: row[11],    // col L
+          med: row[12],     // col M
+        },
+        tiktok: {
+          min: row[13],     // col N
+          max: row[14],     // col O
+          mode: row[15],    // col P
+          med: row[16],     // col Q
+        },
+      },
+      ourStorePrice: {
+        lazada: row[17],   // col R
+        shopee: row[18],   // col S
+        tiktok: row[19],   // col T
+      }
+    };
+
+    return obj;
+  })
+  Logger.log(`mapping_competitive_object [res]: ${JSON.stringify(competitveData, null, 2)}`);
+
+  const responseAI = callGeminiSummarizeCompetitiveSheet(competitveData)
+  insertCompetitiveAnalytics(parsedLatestUpdate, responseAI)
+  return 
 }

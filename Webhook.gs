@@ -1,5 +1,5 @@
 const insertProductWithVariants = async () => {
-  const bigsellerProductId = 27508721
+  const bigsellerProductId = 27508706
   const bigseller = await callApiGetProductLazada(bigsellerProductId)
 
   const variantOptions = {
