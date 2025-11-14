@@ -265,6 +265,7 @@ function fetchBigsellerToken(propName = 'BIGSELLER_COOKIE') {
   // get and update latest cookie
   const scriptProperties = PropertiesService.getScriptProperties()
   const existedCookie = scriptProperties.getProperty(propName)
+  Logger.log('fetch_bigseller_token [resp]:'+ JSON.stringify(cookie !== existedCookie))
   if(cookie === existedCookie) return { cookie: existedCookie, ...cookieObj }
   scriptProperties.setProperty(propName, cookie)
 

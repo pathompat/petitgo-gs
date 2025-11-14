@@ -3,6 +3,7 @@ function updateSheetCompetitivePrice() {
   const bigsellerShopee = callApiListProductShopee()
   const bigsellerLazada = callApiListProductLazada()
   const bigsellerTiktok = callApiListProductTiktok()
+  if (bigsellerShopee.length === 0 || bigsellerLazada.length === 0 || bigsellerTiktok.length === 0) return
 
   searchProducts.forEach(product => {
     const { sku, name, row, keyword, priceMin, priceMax } = product
