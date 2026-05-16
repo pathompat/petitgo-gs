@@ -9,7 +9,12 @@ function sendDiscordNotification(webhookUrl, message) {
   const options = {
     "method": "POST",
     "contentType": "application/json",
-    "payload": JSON.stringify(payload)
+    "payload": JSON.stringify(payload),
+    muteHttpExceptions: true
   }
-  return UrlFetchApp.fetch(webhookUrl, options)
+  const response = UrlFetchApp.fetch(webhookUrl, options)
+  Logger.log(response.getResponseCode());
+  Logger.log(response.getContentText());
+  Logger.log(JSON.stringify(response.getAllHeaders()));
+  return response
 }
