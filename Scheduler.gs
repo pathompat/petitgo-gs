@@ -150,13 +150,7 @@ const updateLineShopInventory = async () => {
 //   return 
 // }
 
-// every sunday 23:30
-const INVENTORY_SHEET_CONFIG = {
-  SPREADSHEET_ID: '1qY3QwT1POdYhgE1jeTWsxqLlra2CsUdsXVa2E8wl60c',
-  SHEET_NAME: 'Inventory Snap',
-  TIMEZONE: 'Asia/Bangkok',
-};
-
+// every sunday midnight
 const snapshotInventory = async () => {
   const lock = LockService.getScriptLock();
 
@@ -173,16 +167,16 @@ const snapshotInventory = async () => {
     }
 
     const spreadsheet = SpreadsheetApp.openById(
-      INVENTORY_SHEET_CONFIG.SPREADSHEET_ID
+      COMP_SPREADSHEET_ID
     );
 
     const sheet = spreadsheet.getSheetByName(
-      INVENTORY_SHEET_CONFIG.SHEET_NAME
+      INVENTORY_SNAP_SHEET
     );
 
     if (!sheet) {
       throw new Error(
-        `Sheet tab "${INVENTORY_SHEET_CONFIG.SHEET_NAME}" not found.`
+        `Sheet tab "${INVENTORY_SNAP_SHEET}" not found.`
       );
     }
 
