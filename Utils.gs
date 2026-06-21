@@ -70,3 +70,46 @@ function cleanDescription(html) {
 
   return cleaned;
 }
+
+function safeText_(value) {
+  return value === null || value === undefined
+    ? ''
+    : String(value);
+}
+
+function toNumber_(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    value === '--'
+  ) {
+    return 0;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function toNullableNumber_(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    value === '--'
+  ) {
+    return null;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function roundNumber_(value, decimalPlaces) {
+  const multiplier = Math.pow(10, decimalPlaces);
+
+  return (
+    Math.round((value + Number.EPSILON) * multiplier) /
+    multiplier
+  );
+}

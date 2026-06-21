@@ -149,3 +149,117 @@ const updateLineShopInventory = async () => {
 //   insertCompetitiveAnalytics(parsedLatestUpdate, responseAI)
 //   return 
 // }
+
+// every sunday 23:30
+const INVENTORY_SHEET_CONFIG = {
+  SPREADSHEET_ID: '1qY3QwT1POdYhgE1jeTWsxqLlra2CsUdsXVa2E8wl60c',
+  SHEET_NAME: 'Inventory Snap',
+  TIMEZONE: 'Asia/Bangkok',
+};
+
+const snapshotInventory = async () => {
+  const lock = LockService.getScriptLock();
+
+  try {
+    lock.waitLock(30000);
+
+    await fetchBigsellerToken();
+
+    const inventory = await callApiBigSellerInventory();
+
+    if (!Array.isArray(inventory) || inventory.length === 0) {
+      Logger.log('No inventory data found.');
+      return;
+    }
+
+    const spreadsheet = SpreadsheetApp.openById(
+      INVENTORY_SHEET_CONFIG.SPREADSHEET_ID
+    );
+
+    const sheet = spreadsheet.getSheetByName(
+      INVENTORY_SHEET_CONFIG.SHEET_NAME
+    );
+
+    if (!sheet) {
+      throw new Error(
+        `Sheet tab "${INVENTORY_SHEET_CONFIG.SHEET_NAME}" not found.`
+      );
+    }
+
+    const headers = [
+      'Snapshot At',
+      'SKU',
+      'Title',
+      'Warehouse',
+      'Category',
+      'On Hand',
+      'Cost',
+      'Total Cost',
+    ];
+
+    // Add header when sheet is empty.
+    if (sheet.getLastRow() === 0) {
+      sheet
+        .getRange(1, 1, 1, headers.length)
+        .setValues([headers])
+        .setFontWeight('bold');
+
+      sheet.setFrozenRows(1);
+    }
+
+    const snapshotAt = new Date();
+
+    const rows = inventory.map((item) => {
+      const onHand = toNumber_(item.onhand);
+      const cost = toNumber_(item.cost);
+
+      const apiTotalCost = toNullableNumber_(item.totalCost);
+
+      const totalCost =
+        apiTotalCost !== null
+          ? apiTotalCost
+          : roundNumber_(onHand * cost, 2);
+
+      return [
+        snapshotAt,
+        safeText_(item.sku),
+        safeText_(item.title),
+        safeText_(item.warehouseName),
+        safeText_(item.classifyName),
+        onHand,
+        cost,
+        totalCost,
+      ];
+    });
+
+    const startRow = sheet.getLastRow() + 1;
+
+    sheet
+      .getRange(startRow, 1, rows.length, headers.length)
+      .setValues(rows);
+
+    // Format only newly appended rows.
+    sheet
+      .getRange(startRow, 1, rows.length, 1)
+      .setNumberFormat('yyyy-mm-dd hh:mm:ss');
+
+    sheet
+      .getRange(startRow, 6, rows.length, 1)
+      .setNumberFormat('#,##0.00');
+
+    sheet
+      .getRange(startRow, 7, rows.length, 2)
+      .setNumberFormat('#,##0.00');
+
+    SpreadsheetApp.flush();
+
+    Logger.log(
+      `Inventory snapshot appended successfully: ${rows.length} rows`
+    );
+  } catch (error) {
+    Logger.log(error.stack || error);
+    throw error;
+  } finally {
+    lock.releaseLock();
+  }
+}
